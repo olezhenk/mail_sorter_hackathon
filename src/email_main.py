@@ -6,7 +6,6 @@ class Email:
         self.to = ""
         self.subject = ""
         self.text = ""
-        self.html = ""
         self.date = ""
         self.files = []
 
@@ -21,10 +20,6 @@ class Email:
         print(f"Кому: {self.to}")
         print(f"Тема: {self.subject}")
         print(f"Текст: {self.text}")
-        if self.html:
-            print(f"HTML: {self.html}")
-        else:
-            print("HTML: нет")
         print(f"Дата: {self.date}")
         if self.files:
             print(f"Файлы: {', '.join(self.files)}")
