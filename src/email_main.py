@@ -1,14 +1,33 @@
 #экземляр (модель письма) Лена Руссу
-from dataclasses import dataclass
-from typing import Optional
-
-@dataclass
 class Email:
-    message_id: str
-    from_email: str
-    to: str
-    subject: str
-    text: str
-    html: Optional[str] = None
-    date: Optional[str] = None
-    files: list = None
+    def __init__(self):
+        self.message_id = ""
+        self.from_email = ""
+        self.to = ""
+        self.subject = ""
+        self.text = ""
+        self.html = ""
+        self.date = ""
+        self.files = []
+
+    def add_file(self, filename):
+        self.files.append(filename)
+        print(f"Добавлен файл: {filename}")
+
+    def show_info(self):
+        print("=== ИНФОРМАЦИЯ О ПИСЬМЕ ===")
+        print(f"ID письма: {self.message_id}")
+        print(f"От: {self.from_email}")
+        print(f"Кому: {self.to}")
+        print(f"Тема: {self.subject}")
+        print(f"Текст: {self.text}")
+        if self.html:
+            print(f"HTML: {self.html}")
+        else:
+            print("HTML: нет")
+        print(f"Дата: {self.date}")
+        if self.files:
+            print(f"Файлы: {', '.join(self.files)}")
+        else:
+            print("Файлы: нет")
+        print("=========================")
