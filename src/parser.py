@@ -17,18 +17,16 @@ class Letter:
 
 
 class LetterExtractor:
-    _UNICODE_ESCAPE = re.compile(r'\\u([0-9a-fA-F]{4})')
-
     def extract(self, file_path):
         text = self.read_letter(file_path)
-        headers, body_text = self.split_letter(text)
+        headers, body = self.split_letter(text)
 
         return Letter(
             sender=self.find_header(headers, "from", "от", "отправитель"),
             recipient=self.find_header(headers, "to", "кому", "получатель"),
             subject=self.find_header(headers, "subject", "тема"),
             date=self.parsing(self.find_header(headers, "date", "дата")),
-            text_body=self.clean_text(body_text),
+            text_body=body,
             source_file=str(Path(file_path).resolve()))
 
     def read_letter(self, path: str):
@@ -48,7 +46,7 @@ class LetterExtractor:
         for alias in aliases:
             if alias in headers:
                 return headers[alias]
-        return None 
+        return ""
 
     def parsing(self, date):
         if not date:
@@ -59,9 +57,3 @@ class LetterExtractor:
             except ValueError:
                 continue
         return None
-
-    def clean_text(self, text):
-        if not text:
-            return text
-        decoded = self._UNICODE_ESCAPE.sub(lambda m: chr(int(m.group(1), 16)), text)
-        return decoded
