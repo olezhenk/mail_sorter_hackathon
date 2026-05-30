@@ -1,13 +1,13 @@
-# test_run.py
 import sys
 import os
 from parser import LetterExtractor
 
+path = "/workspaces/mail_sorter_hackathon/tests/test_letter1"
 extractor = LetterExtractor()
-if not os.path.exists("/workspaces/mail_sorter_hackathon/src/test_letter1"):
+if not os.path.exists(path):
     print("Нет файла")
 try:
-    letter = extractor.extract("/workspaces/mail_sorter_hackathon/src/test_letter1")
+    letter = extractor.extract(path)
     print(f"Отправитель:",letter.sender)
     print(f"Получатель:", letter.recipient)
     print(f"Тема: ", letter.subject)
