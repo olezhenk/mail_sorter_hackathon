@@ -1,6 +1,4 @@
 # чтение писем из архива Лена Коровина
-
-
 import zipfile
 import os
 from typing import List, Optional, Union

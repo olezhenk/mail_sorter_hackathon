@@ -14,7 +14,7 @@ class emailsort:
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-        name=os.path.basename(file):
+        name=os.path.basename(file)
         d=os.path.join(folder,name)
 
         shutil.move(file,d)
