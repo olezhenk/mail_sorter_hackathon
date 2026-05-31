@@ -9,17 +9,15 @@
 
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional, Dict, Any
-from dataclasses import dataclass
-from enum import Enum
 import re, logging
-from .email_main import Email
-#шаблонный класс для "подходит ли письмо под данное условие"
+from .email_main import Letter
+#шаблонный класс для создания базовых правил, то есть "подходит ли письмо под данное условие"
 class rule(ABC):
     @abstractmethod
-    def match(self, email):
+    def matches(self, email):
         pass
 
-#перегруз операторов для применения нескольких правил
+#перегруз операторов и и или для применения нескольких правил к письму одновременно
 class composite_rule(rule):
     def __init__(self, rules, logic):
         self.rules = rules
@@ -31,7 +29,7 @@ class composite_rule(rule):
         else:
             return any(rule.matches(email) for rule in self.rules)
     
-#даем первому абстрактному классу эти операторы
+#даем абстрактному правилу эти операторы
 def and_operator(self, other):
     return composite_rule([self, other], "AND")
 def or_operator(self, other):
@@ -39,13 +37,13 @@ def or_operator(self, other):
 rule.__and__ = and_operator
 rule.__or__ = or_operator
 
-#проверка отправителя на корректность
+#праивло для проверки отправителя на корректность
 class sender_rule(rule):
-    #patterns - список доменов, exact_match - если true, то ищем точное совпадение email, иначе подстроку
+    #patterns это список доменов, exact_match это условие, нужно ли найти точное совпадение, или хватит вхождения
     def __init__(self, patterns, exact_match):
         self.patterns = [p.lower() for p in patterns]
         self.exact_match = exact_match
-    #приводим для удобства к нижнему регистру и ишем или полное совпадение, или вхождение
+    #приводим для удобства к нижнему регистру и ишем вхождение/совпадение
     def matches(self, email):
         sender_lower = email.sender.lower()
         for pattern in self.patterns:
@@ -57,9 +55,9 @@ class sender_rule(rule):
                     return True
         return False
 
-#поиск ключевых слов для простой классификации
+#правило по поиску ключевых слов(срочно, быстро, незамедлительно и любые другие)
 class keyword_rule(rule):
-    #keywords - список ключевых слов, case_sensitive - учитывать ли регистр, target - где искать(subject, body, both)
+    #keywords это ключевые слова, case_sensitive - нужен ли регистр, target - где искать(название, письмо или сразу и там, и там)
     def __init__(self, keywords, case_sensitive, target):
         if case_sensitive:
             self.keywords = keywords
@@ -67,7 +65,7 @@ class keyword_rule(rule):
             self.keywords = [kw.lower() for kw in keywords]
         self.case_sensitive = case_sensitive
         self.target = target
-    #берем текст и заголовок письма в нужном нам формате(с оставленным регистром или в нижнем)
+    #берем текст и заголовок письма в нужном регистре и ищем ключи
     def matches(self, email):
         text_parts = []
         if self.target in ("subject", "both"):
@@ -84,8 +82,11 @@ class keyword_rule(rule):
             text_parts.append(body)
         combined_text = " ".join(text_parts)
         return any(kw in combined_text for kw in self.keywords)
-    
-#проверка регуляркой на наличие номеров, слов типо срочно и так далее
+
+
+'''   
+ПОКА ХЗ, ОСТАВЛЯТЬ ЛИ ЭТО
+#проверка регуляркой на наличие номеров, чисел и других
 class regex_rule(rule):
     def __init__(self, pattern, target):
         self.regex = re.compile(pattern)
@@ -98,8 +99,9 @@ class regex_rule(rule):
         if self.target in ("body", "both"):
             text += email.body_plain
         return bool(self.regex.search(text))
+'''
     
-#добавляет приоритетность правилу
+#добавляет правилу приоритетность(например, если ключевое слово важнее номера в письме)
 class priority_rule(rule):
     def __init__(self, rule, priority):
         self.rule = rule
@@ -108,29 +110,29 @@ class priority_rule(rule):
     def matches(self, email):
         return self.rule.matches(email)
     
-#распределитель правил
+#распределитель всех правил
 class main_classifier(rule):
-    #def_category - категория писем, что не подошли под правила, stop_on_first_match - остановка при первом мэтче
-    def __init__(self, def_category, stop_on_first_match: bool):
+    #def_category вернется, когда ни одно правило не подойдет под наше письмо, stop_on_first_match это бул переменная, если нужна остановка при первом мэтче
+    def __init__(self, default_category, stop_on_first_match):
         self._rules = []
-        self.default_category = def_category
+        self.default_category = default_category
         self.stop_on_first_match = stop_on_first_match
-        #self.logger = logging.getLogger(__name__)
 
     def add_rule(self, rule, category, priority):
-        # Если правило имеет приоритет, учитываем его
+        #при добавлении учитываем приоритет(если он есть)
         if hasattr(rule, 'priority'):
             priority = rule.priority
         self._rules.append((rule, category))
         #ленивая сортировка в одну строку
-        self._rules.sort(key=lambda x: getattr(x[0], 'priority', 0), reverse=True)
+        self._rules.sort(key=lambda x: getattr(x[0], 'priority', 0))
 
-    #на всякий и удаление правила
-    def remove_rule(self, category: str, rule_index):
-        if rule_index is not None:
-            del self._rules[rule_index]
+    #на всякий случай и возможность удалить правило
+    def remove_rule(self, category, index):
+        if index is not None:
+            del self._rules[index]
+        #если нет конкретного индекса, то мы хотим удалить все правила из данной категории(например, не по ключевому слову срочно, а вообще все по ключевым словам)
         else:
-            self._rules = [(r, rule) for r, rule in self._rules if rule != category]
+            self._rules = [(rule, categ) for rule, categ in self._rules if categ != category]
 
     #возвращает категорию письма по первому сработанному правилу
     def classify(self, email):
@@ -138,12 +140,11 @@ class main_classifier(rule):
         for rule, category in self._rules:
             try:
                 if rule.matches(email):
-                    #self.logger.debug(f"Rule matched: {rule.__class__.__name__} -- {category}")
                     matched_categories.append(category)
                     if self.stop_on_first_match:
                         return category
             except Exception as err:
-                self.logger.error(f"ненашлось правило {rule}: {err}")
+                self.logger.error(f"не нашлось правило {rule}: {err}")
         #тут я поставил массив, потому что, в теории, может пригодиться иметь и остальные категории
         if matched_categories:
             return matched_categories[-1]
@@ -152,38 +153,4 @@ class main_classifier(rule):
     #встроенная штука для нахожения количества(потом для подведения статы будет неплохо)
     def __len__(self):
         return len(self._rules)
-
-#записываем правила в джсон файл и эта штука их распределяет
-class rule_factory:
-        @staticmethod
-        def create(config):
-            rule_type = config.get("type", "").lower()
-            if rule_type == "keyword":
-                return keyword_rule(
-                    keywords=config["keywords"],
-                    case_sensitive=config.get("case_sensitive", False),
-                    target=config.get("target", "both")
-                )
-            elif rule_type == "sender":
-                return sender_rule(
-                    patterns=config["patterns"],
-                    exact_match=config.get("exact_match", False)
-                )
-            elif rule_type == "regex":
-                return regex_rule(
-                    pattern=config["pattern"],
-                    target=config.get("target", "both")
-                )
-            elif rule_type == "composite":
-                sub_rules = [rule_factory.create(sub) for sub in config["rules"]]
-                return composite_rule(
-                    rules=sub_rules,
-                    logic=config.get("logic", "AND")
-                )
-            else:
-                raise ValueError(f"неизвестное правило: {rule_type}")
     
-
-
-
-
