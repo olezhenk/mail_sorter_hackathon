@@ -10,7 +10,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional, Dict, Any
 import re, logging
-from .email_main import Letter
+from email_main import Letter
 #шаблонный класс для создания базовых правил, то есть "подходит ли письмо под данное условие"
 class rule(ABC):
     @abstractmethod
