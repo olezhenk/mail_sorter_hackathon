@@ -3,7 +3,7 @@ import sys
 import os
 from parser import LetterExtractor
 
-test_letters = ["test_letter1", "test_letter2", "test_letter3", "test_letter4", "test_letter5"]
+test_letters = ["test_letter1", "test_letter2", "test_letter3", "test_letter4", "test_letter5", "test_letter6", "test_letter7.txt", "test_letter8.txt", "test_letter9.txt", "test_letter10.txt"]
 path = "/workspaces/mail_sorter_hackathon/tests/"
 extractor = LetterExtractor()
 
