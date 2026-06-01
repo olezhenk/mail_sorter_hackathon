@@ -11,7 +11,6 @@ reader = Reader(zip="inbox.zip", extractor=extractor)
 #тут будут некоторые правила для классификации
 classifier = main_classifier(default_category="inbox", stop_on_first_match=True)
 
-
 #срочные письма
 urgent_rule = keyword_rule(['срочно', 'быстро', 'незамедлительно', 'до конца дня', 'критично', 'дедлайн', 'сроки'], False, "both")
 classifier.add_rule(urgent_rule, "urgent", 5)
@@ -44,7 +43,6 @@ classifier.add_rule(meeting_rule, "meeting", 9)
 project_rule = keyword_rule(['проект', 'задача', 'дедлайн', 'сроки', 'релиз', 'разработка', 'бэк'], False, "both")
 classifier.add_rule(project_rule, "project", 10)
 
-
 #финансы
 finance_rule = sender_rule(['sberbank.ru', 'alfa.ru', 'tbank.ru', 'vtb.ru'], False)
 classifier.add_rule(finance_rule, "finance", 20)
@@ -68,9 +66,6 @@ classifier.add_rule(auto_sender_rule, "auto_reply", 75)
 #письма в спам
 spam_rule = keyword_rule(['акция', 'выигрыш', 'распродажа', 'лотерея', 'скидка'], False, "both")
 classifier.add_rule(spam_rule, "spam", -1)
-
-
-
 
 
 #список файлов в архиве
