@@ -10,7 +10,7 @@ class LetterExtractor:
         headers, body = self.split_letter(text)
 
         return Letter(
-            from_email = self.find_header(headers, "from", "от", "отправитель"),
+            from_email = self.find_header(headers, "from", "от", "отправитель", "ot kogo", "от кого"),
             to=self.find_header(headers, "to", "кому", "получатель"),
             subject=self.find_header(headers, "subject", "тема"),
             date=self.parsing(self.find_header(headers, "date", "дата")),
