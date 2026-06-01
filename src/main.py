@@ -54,7 +54,7 @@ reminder_rule = keyword_rule(['напоминание', 'не забудьте',
 classifier.add_rule(reminder_rule, "reminder", 21)
 
 #стата по работе
-report_rule = keyword_rule(['отчет', 'статистика', 'аналитика', 'метрики', 'kpi', 'показатели', 'данные'], False, "both")
+report_rule = keyword_rule(['отчет', 'статистика', 'аналитика', 'метрики', 'kpi', 'показатели', 'данные', 'мониторинг'], False, "both")
 classifier.add_rule(report_rule, "report", 30)
 
 #вакансии
@@ -67,7 +67,7 @@ classifier.add_rule(auto_sender_rule, "auto_reply", 75)
 
 #письма в спам
 spam_rule = keyword_rule(['акция', 'выигрыш', 'распродажа', 'лотерея', 'скидка'], False, "both")
-classifier.add_rule(spam_rule, "spam", 100000000)
+classifier.add_rule(spam_rule, "spam", 0)
 
 
 
