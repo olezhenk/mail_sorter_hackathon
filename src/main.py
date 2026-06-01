@@ -6,7 +6,6 @@ from actions import emailsort
 extractor = LetterExtractor()
 reader = Reader(zip="inbox.zip", extractor=extractor)
 
-
 #тут ниже будут некоторые правила для классификации
 classifier = main_classifier(default_category="inbox", stop_on_first_match=True)
 #письма свыше прям от бога
