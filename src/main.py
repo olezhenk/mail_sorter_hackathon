@@ -22,12 +22,12 @@ classifier.add_rule(finance_rule, "finance", 10)
 
 
 #нужно подумать, добавлять ли регулярку и что на нее добавлять(номера телефонов там и так далее)
+#список файлов  вархиве
+
 letters = reader.list_files()
 print(letters)
 #создаем папку для прошедших проверку хз как еще сфомулировать
 sorter = emailsort(base="sorted_emails")
-#список файлов  вархиве
-
 email_to_sort = []
 for filename in letters:
     if reader.get_file_extension(filename) == "txt":
@@ -37,12 +37,11 @@ for filename in letters:
             print("Письмо №", letters.index(filename) + 1, "категория письма: ", category)
             #добавка письма и пути к нему в список прошедших проверку писем
             email_to_sort.append((filename, letter))
-            #letter.__str__()
         else:
             print(f"oшибка чтения: {filename}")
     else:
         print(f"пропущен файл(не txt): {filename}")
-        sorter.sort_one(filename, "SPAM")
+        sorter.sort_one(filename, "spam")
 
 sorter.sort_all(email_to_sort, classifier)
 sorter.print_statistic()

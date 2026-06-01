@@ -8,7 +8,8 @@ class emailsort:
         self.statistika={}
 
     def sort_one(self,file,category):
-        if not os.path.exists(file):
+        file_path = os.path.abspath(file)
+        if not os.path.exists(file_path):
             print(f"Файл не найден:{file}")
             return 
         folder=os.path.join(self.base,category)
