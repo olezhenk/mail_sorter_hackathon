@@ -67,7 +67,7 @@ classifier.add_rule(auto_sender_rule, "auto_reply", 75)
 
 #письма в спам
 spam_rule = keyword_rule(['акция', 'выигрыш', 'распродажа', 'лотерея', 'скидка'], False, "both")
-classifier.add_rule(spam_rule, "spam", 0)
+classifier.add_rule(spam_rule, "spam", -1)
 
 
 
