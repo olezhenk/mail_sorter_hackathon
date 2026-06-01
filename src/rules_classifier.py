@@ -4,9 +4,6 @@
 
 #ВАЖНО - ЭТО ФАЙЛ С КЛАССАМИ ПРАВИЛ. САМИ ПРАВИЛА СОЗДАЮТСЯ В MAIN И В НИХ ПРОПИСЫВАЕТСЯ КОНКРЕТИКА, ТУТ ЖЕ АБСТРАКЦИЯ
 
-
-
-
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional, Dict, Any
 import re, logging

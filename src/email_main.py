@@ -7,6 +7,5 @@ class Letter:
         self.date = date
         self.files = files
 
-
     def __str__(self):
         print(f"From: {self.from_email}\nTo: {self.to}\nSubject: {self.subject}\nDate: {self.date}\nText: {self.text[:50]}...\nFiles: {self.files}")
