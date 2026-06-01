@@ -96,7 +96,7 @@ for filename in letters:
             print(f"Ошибка парсинга структуры письма: {filename}")
             sorter.sort_one(extracted_path, "inbox")
     else:
-        # Если файл не txt, отправляем в спам 
+        #если файл не txt, отправляем в спам 
         print(f"Пропущен файл (не txt): {filename} -> отправлен в spam")
         sorter.sort_one(extracted_path, "spam")
 
