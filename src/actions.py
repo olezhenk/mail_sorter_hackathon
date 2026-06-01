@@ -29,6 +29,6 @@ class emailsort:
             self.sort_one(path,cat)
     def print_statistic(self):
         print("\nИтого:")
-        for cat,count in self.stats.items():
+        for cat,count in self.statistika.items():
             print(f"{cat}:{count} писем")
 
