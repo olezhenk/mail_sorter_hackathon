@@ -1,1 +1,9 @@
 inbox.zip
+*.zip
+sorted_emails/
+*.log
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
