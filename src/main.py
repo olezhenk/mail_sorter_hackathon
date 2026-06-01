@@ -3,46 +3,53 @@ from parser import LetterExtractor
 from reader import Reader
 from email_main import Letter
 from actions import emailsort
+import os
+
 extractor = LetterExtractor()
 reader = Reader(zip="inbox.zip", extractor=extractor)
-#тут ниже будут некоторые правила для классификации
+
+# Правила для классификации
 classifier = main_classifier(default_category="inbox", stop_on_first_match=True)
-#письма свыше прям от бога
+#от руководства
 boss_rule = sender_rule(['@company.ru', 'ceo@company.ru', 'boss@company.ru'], False)
 classifier.add_rule(boss_rule, "from_boss", 1)
-#письма в спам
+#спам
 spam_rule = keyword_rule(['акция', 'выигрыш', 'распродажа', 'лотерея', 'скидка'], False, "both")
 classifier.add_rule(spam_rule, "spam", 100)
-#срочные письма
+#срочное
 urgent_rule = keyword_rule(['срочно', 'быстро', 'незамедлительно', 'до конца дня', 'критично'], False, "both")
 classifier.add_rule(urgent_rule, "urgent", 5)
-#финансы
+#финансовое
 finance_rule = sender_rule(['sberbank.ru', 'alfa.ru', 'tbank.ru', 'vtb.ru'], False)
 classifier.add_rule(finance_rule, "finance", 10)
 
-
-#нужно подумать, добавлять ли регулярку и что на нее добавлять(номера телефонов там и так далее)
-#список файлов  вархиве
-
+#список файлов в архиве
 letters = reader.list_files()
-print(letters)
-#создаем папку для прошедших проверку хз как еще сфомулировать
-sorter = emailsort(base="sorted_emails")
-email_to_sort = []
+print("Файлы в архиве:", letters)
+#папка для сортировки
+BASE_DIR = "sorted_emails"
+sorter = emailsort(base=BASE_DIR)
+
 for filename in letters:
+    extracted_path = reader.extract_to_temporary(filename)
+    if not extracted_path:
+        print(f"Ошибка извлечения файла из архива: {filename}")
+        continue
+
     if reader.get_file_extension(filename) == "txt":
-        letter = reader.read_file(filename)
+        letter = extractor.extract(extracted_path)
         if letter is not None:
             category = classifier.classify(letter)
-            print("Письмо №", letters.index(filename) + 1, "категория письма: ", category)
-            #добавка письма и пути к нему в список прошедших проверку писем
-            email_to_sort.append((filename, letter))
+            print(f"Письмо {filename} -> Категория: {category}")
+            sorter.sort_one(extracted_path, category)
         else:
-            print(f"oшибка чтения: {filename}")
+            print(f"Ошибка парсинга структуры письма: {filename}")
+            sorter.sort_one(extracted_path, "inbox")
     else:
-        print(f"пропущен файл(не txt): {filename}")
-        sorter.sort_one(filename, "spam")
+        # Если файл не txt, отправляем в спам 
+        print(f"Пропущен файл (не txt): {filename} -> отправлен в spam")
+        sorter.sort_one(extracted_path, "spam")
 
-sorter.sort_all(email_to_sort, classifier)
 sorter.print_statistic()
 reader.cleanup()
+
