@@ -41,7 +41,7 @@ for filename in letters:
             print(f"oшибка чтения: {filename}")
     else:
         print(f"пропущен файл(не txt): {filename}")
-        sorter.sort_one(filename, "SPAM")
+        #sorter.sort_one(filename, "SPAM")
 
 sorter.sort_all(email_to_sort, classifier)
 sorter.print_statistic()

@@ -108,12 +108,13 @@ class priority_rule(rule):
         return self.rule.matches(email)
     
 #распределитель всех правил
-class main_classifier(rule):
+class main_classifier:
     #def_category вернется, когда ни одно правило не подойдет под наше письмо, stop_on_first_match это бул переменная, если нужна остановка при первом мэтче
     def __init__(self, default_category, stop_on_first_match):
         self._rules = []
         self.default_category = default_category
         self.stop_on_first_match = stop_on_first_match
+        self.logger = logging.getLogger(__name__)
 
     def add_rule(self, rule, category, priority):
         #при добавлении учитываем приоритет(если он есть)
